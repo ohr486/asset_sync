@@ -1,17 +1,10 @@
 defmodule AssetSync do
-
   use Application
-
   alias AssetSync.Utils, as: Utils
 
-
   def start(_types, _args) do
-    IO.puts "########################################"
-    IO.puts "--- AssetSync Application.start ---"
-    IO.puts "########################################"
     AssetSync.Supervisor.start_link
   end
-
 
   # use callback api
   # TODO: test it
@@ -112,5 +105,4 @@ defmodule AssetSync do
   def asset_host do
     Application.get_env(:asset_sync, :asset_host)
   end
-
 end
