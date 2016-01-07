@@ -1,0 +1,11 @@
+%{"certifi": {:hex, :certifi, "0.3.0"},
+  "ex_aws": {:hex, :ex_aws, "0.4.13"},
+  "hackney": {:hex, :hackney, "1.4.7"},
+  "httpoison": {:hex, :httpoison, "0.8.0"},
+  "idna": {:hex, :idna, "1.0.2"},
+  "meck": {:hex, :meck, "0.8.3"},
+  "mimerl": {:hex, :mimerl, "1.0.2"},
+  "poison": {:hex, :poison, "1.5.0"},
+  "power_assert": {:hex, :power_assert, "0.0.6"},
+  "ssl_verify_hostname": {:hex, :ssl_verify_hostname, "1.0.5"},
+  "sweet_xml": {:hex, :sweet_xml, "0.5.0"}}
