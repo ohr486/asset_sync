@@ -10,7 +10,7 @@ asset_sync
 ```
 defp deps do
   [...,
-   {:asset_sync, github: "ohr486/asset_sync", tag: "0.0.1" },
+   {:asset_sync, github: "ohr486/asset_sync", tag: "v0.0.1-dev" },
    {:sweet_xml, "~> 0.5", optional: true},
   ]
 end
@@ -48,7 +48,7 @@ config :asset_sync,
   storage: :s3,
   bucket: "your-asset-bucket",
   target_asset_dir: "priv/static",
-  #asset_host: "https://s3-ap-northeast-1.amazonaws.com/british-gadget-production", # if use S3 hosting
+  #asset_host: "https://s3-ap-northeast-1.amazonaws.com/your-asset-bucket", # if use S3 hosting
   asset_host: "https://xxxxxxxxxxxx.cloudfront.net" # if use CloudFront Hosting
 
 ...
