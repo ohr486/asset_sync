@@ -33,12 +33,35 @@ defmodule AssetSync.Utils do
   def content_type(file_path) do
     file_type = file_path |> String.split(".") |> Enum.take(-1) |> List.first
     case file_type do
-      "gif" -> "image/gif"
-      "jpg" -> "image/jpeg"
+      # image
+      "gif"  -> "image/gif"
+      "jpg"  -> "image/jpeg"
       "jpeg" -> "image/jpeg"
-      "png" -> "image/png"
+      "png"  -> "image/png"
+
+      # font
+      "svg"   -> "image/svg+xml"
+      "eot"   -> "application/vnd.ms-fontobject"
+      "woff"  -> "application/x-font-woff"
+      "woff2" -> "application/x-font-woff2"
+      "ttf"   -> "application/x-font-ttf"
+      "otf"   -> "application/x-font-otf"
+
+      # js
       "js" -> "text/javascript"
+
+      # css
       "css" -> "text/css"
+
+      # ico
+      "ico" -> "image/x-icon"
+
+      # txt
+      "txt" -> "text/plain"
+
+      # json
+      "json" -> "application/json"
+
       "html" -> "text/html"
       _ -> "application/octet-stream"
     end
