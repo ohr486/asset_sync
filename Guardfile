@@ -19,12 +19,12 @@ guard :shell do
   watch(/lib\/(.*).ex/) do |m|
     target = "test/#{m[1]}_test.exs"
     system("echo run [mix test #{target}]")
-    system("mix test #{target}")
+    system("MIX_ENV=test mix test #{target}")
   end
 
   watch(/test\/(.*).exs/) do |m|
     system("echo run [mix test #{m[0]}]")
-    system("mix test #{m[0]}")
+    system("MIX_ENV=test mix test #{m[0]}")
   end
 end
 

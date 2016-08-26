@@ -17,7 +17,7 @@ defmodule AssetSync.Mixfile do
 
   defp deps do
     [
-      {:ex_aws, "~> 0.5", optional: true},
+      {:ex_aws, "~> 1.0.0-beta1", override: true},
       {:httpoison, "~> 0.9", optional: true},
       {:poison, "~> 2.2", optional: true},
       {:sweet_xml, "~> 0.6", optional: true},

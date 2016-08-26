@@ -1,124 +1,115 @@
 defmodule AssetSync.Storage.S3 do
+  @moduledoc """
+  """
+
   @behaviour AssetSync.Storage
 
-  alias ExAws.S3
-  alias ExAws.S3.Impl, as: S3Impl
+  # --- handle asset ---
 
-  # --- asset ---
-
-  # TODO: test it
-  def get_assets!(opts \\ []) do
-    client
-    |> S3Impl.list_objects!(bucket, opts)
-    |> Map.fetch!(:body)
-    |> Map.fetch!(:contents)
-    |> Enum.filter(&String.match?(&1.key, ~r/^[^\/]*\/$/))
-  end
-
-  # I/F
-  # TODO: test it
-  def list_assets!(opts \\ []) do
-    get_assets!(opts)
-    |> Enum.map(&Map.fetch!(&1, :key))
+  @doc "Show asset name list"
+  def asset_list!(opts \\ []) do
+    AssetSync.Storage.S3.get_object_data!(opts)
+    |> object_data_to_object_list
+    |> object_list_to_assets
     |> Enum.sort(&(&1 > &2))
   end
- 
-  # I/F
-  # TODO: test it
+
+  @doc "Return newest asset name"
   def newest_asset!(opts \\ []) do
-    case get_assets!(opts) do
+    case asset_list!(opts) do
       [] -> nil
-      assets -> Enum.max_by(assets, &Map.fetch!(&1, :key))[:key]
+      list -> Enum.max(list)
     end
   end
 
-  # I/F
-  # TODO: test it
+  @doc "Create asset dir"
   def create_asset_dir!(asset_ver, opts \\ []) do
-    client
-    |> S3Impl.put_object!(bucket, "#{asset_ver}/", "")
+    AssetSync.Storage.S3.put_object!("#{asset_ver}/", "", opts)
   end
 
-  # I/F
-  # TODO: test it
+  @doc "Delete asset files and dirs"
   def delete_asset!(asset_ver, opts \\ []) do
-    list_asset_files!(asset_ver, opts) |> Enum.each(&delete_object!(&1, opts))
-    list_asset_dirs!(asset_ver, opts) |> Enum.each(&delete_object!(&1, opts))
-    delete_object!("#{asset_ver}/", opts)
+    object_list = AssetSync.Storage.S3.get_object_data!(opts)
+                  |> object_data_to_object_list
+                  |> filter_by_asset_ver(asset_ver)
+                  |> Enum.reject(&String.equivalent?(&1, "#{asset_ver}/"))
+
+    object_list
+    |> object_list_to_files
+    |> Enum.each(&AssetSync.Storage.S3.delete_object!(&1, opts))
+
+    object_list
+    |> object_list_to_dirs
+    |> Enum.each(&AssetSync.Storage.S3.delete_object!(&1, opts))
+
+    AssetSync.Storage.S3.delete_object!("#{asset_ver}/", opts)
   end
 
+  # --- handle object ---
 
-  # --- asset objects ---
+  @doc "Put object to asset dir"
+  def put_object!(path, data, opts \\ []) do
+    ExAws.S3.put_object(AssetSync.Config.bucket, "#{path}", data, opts)
+    |> AssetSync.Storage.S3.exec_operation
+  end
 
-  # TODO: test it
-  def get_asset_objects!(asset_ver, opts \\ []) do
-    client
-    |> S3Impl.list_objects!(bucket, opts) # TODO: pre filter
-    |> Map.fetch!(:body)
-    |> Map.fetch!(:contents)
+  @doc "Delete object from asset dir"
+  def delete_object!(path, opts \\ []) do
+    ExAws.S3.delete_object(AssetSync.Config.bucket, path, opts)
+    |> AssetSync.Storage.S3.exec_operation
   end
 
   # TODO: test it
-  def list_asset_objects!(asset_ver, opts \\ []) do
-    get_asset_objects!(asset_ver, opts)
+  def get_object_data!(opts \\ []) do
+    bucket = AssetSync.Config.bucket
+    ope = ExAws.S3.list_objects(bucket, opts)
+
+    case AssetSync.Storage.S3.exec_operation(ope) do
+      {:ok, body} -> body
+      _ -> raise "list_object error for #{bucket} bucket."
+    end
+  end
+
+  # TODO: test it
+  def exec_operation(ope) do
+    ExAws.request(ope)
+  end
+
+  defp object_data_to_object_list(%{body: %{contents: object_list}}) do
+    object_list
     |> Enum.map(&Map.fetch!(&1, :key))
   end
+  defp object_data_to_object_list(_), do: raise "invalid list_object response."
 
-  # TODO: test it
-  def list_asset_files!(asset_ver, opts \\ []) do
-    list_asset_objects!(asset_ver, opts)
+  defp object_list_to_assets(object_list) do
+    object_list
+    |> Enum.filter(&String.match?(&1, ~r/^[^\/]*\/$/))
+    |> Enum.map(&String.replace_suffix(&1, "/", ""))
+  end
+
+  defp filter_by_asset_ver(object_list, asset_ver) do
+    object_list
+    |> Enum.filter(&String.starts_with?(&1, "#{asset_ver}/"))
+  end
+
+  defp object_list_to_files(object_list) do
+    object_list
     |> Enum.reject(&String.ends_with?(&1, "/"))
-    |> Enum.filter(&String.starts_with?(&1, "#{asset_ver}"))
   end
 
-  # TODO: test it
-  def list_asset_dirs!(asset_ver, opts \\ []) do
-    list_asset_objects!(asset_ver, opts)
+  defp object_list_to_dirs(object_list) do
+    object_list
     |> Enum.filter(&String.ends_with?(&1, "/"))
-    |> Enum.filter(&String.starts_with?(&1, "#{asset_ver}"))
   end
+
+  # --- url path ---
 
   # TODO: test it
-  def put_asset_object!(asset_ver, asset_path, data, opts \\ []) do
-    path = "#{asset_ver}/#{asset_path}"
-    put_object!(path, data, opts)
-  end
-
-  # --- object ---
-
-  # TODO: test it
-  def put_object!(path, data, opts \\ []) do
-    client
-    |> S3Impl.put_object!(bucket, "#{path}", data, opts)
-  end
-
-  # TODO: test it
-  def delete_object!(path, opts \\ []) do
-    client
-    |> S3Impl.delete_object!(bucket, path, opts)
-  end
-
-  # --- URL ---
+  @doc "Return asset url path"
   def asset_url(path) do
-    newest_asset = AssetSync.Config.cache(:newest_asset)
+    asset = AssetSync.Config.cache(:asset_ver) || AssetSync.Config.cache(:newest_asset)
     target_asset_dir = AssetSync.Config.cache(:target_asset_dir)
-    AssetSync.Config.cache(:asset_host) <> "/" <> newest_asset <> target_asset_dir <> path
+    host = AssetSync.Config.cache(:asset_host)
+    host <> "/" <> asset <> "/" <> target_asset_dir <> path
   end
-
-  # --- private ---
-
-  def client do
-    S3.new(region: region)
-  end
-
-  # TODO: Configに委譲
-
-  def region do
-    Application.get_env(:asset_sync, :region) || Application.get_env(:ex_aws, :region) || "us-east-1"
-  end
-
-  def bucket do
-    Application.get_env(:asset_sync, :bucket)
-  end
-
 end

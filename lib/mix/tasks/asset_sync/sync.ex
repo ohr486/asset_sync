@@ -8,7 +8,7 @@ defmodule Mix.Tasks.AssetSync.Sync do
     IO.puts "=============================="
     IO.puts "Sync assets starting ..."
     IO.puts "=============================="
-    AssetSync.sync
+    AssetSync.Cmd.sync
     IO.puts "=============================="
     IO.puts "Sync assets completed ..."
     IO.puts "=============================="
