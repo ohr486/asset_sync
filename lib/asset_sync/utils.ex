@@ -1,5 +1,4 @@
 defmodule AssetSync.Utils do
-
   # TODO: test it
   def list_file_paths(path) do
     case File.dir?(path) do
@@ -12,7 +11,6 @@ defmodule AssetSync.Utils do
   end
 
   def current_time_str do
-    # テスト/mockの為に、AssetSyncUtilsを指定
     now = AssetSync.Utils.local_time
     ymd = now |> elem(0)
     hms = now |> elem(1)
@@ -25,9 +23,7 @@ defmodule AssetSync.Utils do
   end
 
   # TODO: test it
-  def local_time do
-    :calendar.local_time
-  end
+  def local_time, do: :calendar.local_time
 
   # TODO: test it
   def content_type(file_path) do
@@ -66,5 +62,4 @@ defmodule AssetSync.Utils do
       _ -> "application/octet-stream"
     end
   end
-
 end

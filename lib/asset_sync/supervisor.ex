@@ -1,8 +1,9 @@
+# TODO: test it
 defmodule AssetSync.Supervisor do
   use Supervisor
 
   def start_link do
-    Supervisor.start_link(__MODULE__, [], name: :asset_sync_sup)
+    {:ok, _pid} = Supervisor.start_link(__MODULE__, [], name: :asset_sync_sup)
   end
 
   def init([]) do

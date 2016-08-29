@@ -1,22 +1,22 @@
-# asset_sync
-asset_sync
+# asset\_sync
+asset\_sync
 
 ## USAGE
 
 ### configurations
 
-* add asset_sync and sweet_xml to mix deps
+* add asset\_sync and sweet\_xml to mix deps
 
 ```
 defp deps do
   [...,
-   {:asset_sync, github: "ohr486/asset_sync", tag: "v0.0.1-dev" },
-   {:sweet_xml, "~> 0.5", optional: true},
+   {:asset_sync, github: "ohr486/asset_sync", tag: "v0.0.2" },
+   {:sweet_xml, "~> 0.6", optional: true},
   ]
 end
 ```
 
-* add asset_sync to mix application
+* add asset\_sync to mix application
 
 ```
 def application do
@@ -27,7 +27,7 @@ def application do
 end
 ```
 
-* add asset_sync and ex_aws settings to config.exs
+* add asset\_sync and ex\_aws settings to config.exs
 
 ```
 use Mix.Config
@@ -48,13 +48,14 @@ config :asset_sync,
   storage: :s3,
   bucket: "your-asset-bucket",
   target_asset_dir: "priv/static",
-  #asset_host: "https://s3-ap-northeast-1.amazonaws.com/your-asset-bucket", # if use S3 hosting
-  asset_host: "https://xxxxxxxxxxxx.cloudfront.net" # if use CloudFront Hosting
+  asset_ver: "asset-yyyy-mm-dd-HHMMSS", # if you select asset version
+  #asset_host: "https://s3-ap-northeast-1.amazonaws.com/your-asset-bucket", # if you use S3 hosting
+  asset_host: "https://xxxxxxxxxxxx.cloudfront.net" # if you use CloudFront Hosting
 
 ...
 ```
 
-* override web/web.ex's static_path
+* override web/web.ex's static\_path
 
 ```
 def view do
@@ -67,9 +68,7 @@ def view do
     # use asset_sync(after)
     # override static_path/2 for asset_sync
     import YourApp.Router.Helpers, except: [static_path: 2]
-    def static_path(conn, path) do
-      AssetSync.Helpers.static_path(conn, path, YourApp.Router.Helpers)
-    end
+    def static_path(conn, path), do: AssetSync.Helpers.static_path(conn, path, YourApp.Router.Helpers)
 
     ...
   end
