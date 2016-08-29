@@ -16,7 +16,7 @@ defmodule AssetSync.Config do
   # TODO: refactor it
   def cache(key) do
     case :ets.lookup(__MODULE__, key) do
-      [{key, val}] -> val
+      [{_key, val}] -> val
       [] ->
         val = fetch(key)
         case val do

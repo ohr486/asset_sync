@@ -1,5 +1,5 @@
 defmodule AssetSync.UtilsTest do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   setup do
     :meck.expect(AssetSync.Utils, :local_time, fn -> {{2015, 1, 2}, {3, 4, 5}} end)

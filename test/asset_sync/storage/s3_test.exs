@@ -1,5 +1,5 @@
 defmodule AssetSync.Storage.S3Test do
-  use ExUnit.Case, async: true
+  use ExUnit.Case, async: false
 
   setup do
     on_exit fn -> :meck.unload(AssetSync.Storage.S3) end
@@ -138,7 +138,7 @@ defmodule AssetSync.Storage.S3Test do
 
   test "delete_object!/2" do
     _expected_req = %ExAws.Operation.S3{
-      bucket: "bucket",
+      bucket: "test-bucket",
       path: "/path/to/del/obj",
       body: "",
       headers: %{}, http_method: :delete, params: %{},
@@ -151,7 +151,7 @@ defmodule AssetSync.Storage.S3Test do
 
   test "delete_object!/1" do
     _expected_req = %ExAws.Operation.S3{
-      bucket: "bucket",
+      bucket: "test-bucket",
       path: "/path/to/del/obj",
       body: "",
       headers: %{}, http_method: :delete, params: %{},

@@ -7,7 +7,7 @@ defmodule AssetSync.Helpers do
         _ -> default_helper_mod.static_path(conn, path)
       end
     rescue
-      e -> default_helper_mod.static_path(conn, path)
+      _ -> default_helper_mod.static_path(conn, path)
     end
   end
 end

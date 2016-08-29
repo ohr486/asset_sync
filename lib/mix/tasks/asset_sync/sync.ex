@@ -2,7 +2,7 @@ defmodule Mix.Tasks.AssetSync.Sync do
   use Mix.Task
 
   @shortdoc "Sync assets"
-  def run(args) do
+  def run(_args) do
     Mix.Task.run "app.start"
 
     IO.puts "=============================="
